@@ -213,6 +213,7 @@ class LaterPay_Http_Client {
 		else {
 			$transport = self::get_transport();
 		}
+        
 		$response = $transport->request( $url, $headers, $data, $options );
 		return $response;
 	}

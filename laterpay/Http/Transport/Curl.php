@@ -20,6 +20,9 @@ class LaterPay_Http_Transport_Curl extends LaterPay_Http_Transport_Abstract impl
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
         switch ( $type ) {
             case LaterPay_Http_Client::POST:
             case LaterPay_Http_Client::PUT:
@@ -28,6 +31,7 @@ class LaterPay_Http_Transport_Curl extends LaterPay_Http_Transport_Abstract impl
                 break;
         }
         $response = (string) curl_exec($ch);
+
         curl_close($ch);
         return $response;
     }

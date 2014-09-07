@@ -49,8 +49,6 @@ class LaterPay_Client_Signing
         $crypt->setKey( $secret );
         $hash = bin2hex( $crypt->hash( $data ) );
 
-        LaterPay_Core_Logger::debug( 'LaterPay_Client_Signing::create_hmac', array( $hash ) );
-
         return $hash;
     }
 
@@ -100,8 +98,6 @@ class LaterPay_Client_Signing
             }
         }
 
-        LaterPay_Core_Logger::debug( 'LaterPay_Client_Signing::normalise_param_structure', array( $params, $out ) );
-
         return $out;
     }
 
@@ -147,8 +143,6 @@ class LaterPay_Client_Signing
         $param_str = rawurlencode( join( '&', $data ) );
         $result = str_replace( array( '{method}', '{url}', '{params}' ), array( $method, $url, $param_str ), $msg );
 
-        LaterPay_Core_Logger::debug( 'LaterPay_Client_Signing::create_base_message', array( $result ) );
-
         return $result;
     }
 
@@ -168,8 +162,6 @@ class LaterPay_Client_Signing
      * @return string
      */
     protected static function sign( $secret, $params, $url, $method = LaterPay_Core_Request::POST ) {
-
-        LaterPay_Core_Logger::debug( 'LaterPay_Client_Signing::sign', array( $secret, $params, $url, $method ) );
 
         $secret = utf8_encode( $secret );
 
@@ -235,8 +227,6 @@ class LaterPay_Client_Signing
 
         // hash the querystring data
         $hmac = self::sign( $secret, $params, $url, $method );
-
-        LaterPay_Core_Logger::debug( 'LaterPay_Client_Signing::sign', array( 'encoded' => $encoded ) );
 
         return $encoded . '&hmac=' . $hmac;
     }

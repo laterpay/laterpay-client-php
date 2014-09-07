@@ -32,32 +32,24 @@ class LaterPay_Client
 	/**
 	 * @var string
 	 */
-	protected $token_name;
+	protected $token_name = 'laterpay_token';
 
 	/**
      * 
 	 * @return  LaterPay_Client
 	 */
-    public function __construct( $cp_key, $api_key, $api_root, $web_root, $token_name) {
+    public function __construct( $cp_key, $api_key, $api_root, $web_root, $token_name = null ) {
         $this->cp_key   = $cp_key;
         $this->api_key  = $api_key;
         $this->api_root = $api_root;
         $this->web_root = $web_root;
 
-        $this->token_name = $token_name;
+        if ( !empty($token_name) ) {
+            $this->token_name = $token_name;
+        }
         if ( isset( $_COOKIE[$this->token_name] ) ) {
             $this->lptoken = $_COOKIE[$this->token_name];
         }
-
-        LaterPay_Core_Logger::debug( 'LaterPay_Client::constructor', array(
-                            'api_key'       => $this->api_key,
-                            'cp_key'        => $this->cp_key,
-                            'lptoken'       => $this->lptoken,
-                            'token_name'    => $this->token_name,
-                            'api_root'      => $this->api_root,
-                            'web_root'      => $this->web_root,
-                        )
-                    );
     }
 
 	/**
@@ -134,15 +126,6 @@ class LaterPay_Client
                     );
         $url   .= '?' . $params;
 
-        LaterPay_Core_Logger::debug( 'LaterPay_Client::_get_token_redirect_url',
-                        array(
-                            'url'       => $url,
-                            'api_key'   => $this->api_key,
-                            'cp_key'    => $this->cp_key,
-                            'lptoken'   => $this->lptoken,
-                        )
-                    );
-
         return $url;
     }
 
@@ -162,14 +145,6 @@ class LaterPay_Client
         }
         $params = $this->sign_and_encode( $data, $url, LaterPay_Http_Client::GET );
         $url .= '?' . $params;
-
-        LaterPay_Core_Logger::debug('LaterPay_Client::get_identify_url', array(
-                            'url'       => $url,
-                            'api_key'   => $this->api_key,
-                            'cp_key'    => $this->cp_key,
-                            'lptoken'   => $this->lptoken,
-                        )
-                    );
 
         return $url;
     }
@@ -390,14 +365,6 @@ class LaterPay_Client
         $params = $this->sign_and_encode( $data, $base_url, LaterPay_Http_Client::GET );
         $url    = $base_url . '?' . $params;
 
-        LaterPay_Core_Logger::debug('LaterPay_Client::get_web_url', array(
-                            'url'       => $this->get_dialog_api_url( $url ),
-                            'api_key'   => $this->api_key,
-                            'cp_key'    => $this->cp_key,
-                            'lptoken'   => $this->lptoken,
-                        )
-                    );
-
         return $this->get_dialog_api_url( $url );
     }
 
@@ -549,7 +516,6 @@ class LaterPay_Client
      * @return  string query params
      */
     public function sign_and_encode( $params, $url, $method = LaterPay_Http_Client::GET ) {
-        LaterPay_Core_Logger::debug('LaterPay_Client::sign_and_encode', array($params, $url, $method));
 
         return LaterPay_Client_Signing::sign_and_encode( $this->api_key, $params, $url, $method );
     }
@@ -563,8 +529,6 @@ class LaterPay_Client
      * @return  string json string response
      */
     public function get_access( $article_ids, $product_key = null ) {
-
-        LaterPay_Core_Logger::debug('LaterPay_Client::get_access', array('checking access', $article_ids));
 
         if ( ! is_array( $article_ids ) ) {
             $article_ids = array( $article_ids );
@@ -580,19 +544,6 @@ class LaterPay_Client
         }
         $data = $this->make_request( $this->_get_access_url(), $params );
         $allowed_statuses = array( 'ok', 'invalid_token', 'connection_error' );
-
-        if ( ! in_array( $data['status'], $allowed_statuses ) ) {
-            LaterPay_Core_Logger::error( 'get_access::invalid status', array( 'result' => $data ) );
-        }
-
-        LaterPay_Core_Logger::debug( 'LaterPay_Client::get_access', array(
-                            'params'    => $params,
-                            'result'    => $data,
-                            'api_key'   => $this->api_key,
-                            'cp_key'    => $this->cp_key,
-                            'lptoken'   => $this->lptoken,
-                        )
-                    );
 
         return $data;
     }
@@ -613,12 +564,7 @@ class LaterPay_Client
             'cp_key'    => $this->cp_key,
             'lptoken'   => $this->lptoken,
         );
-
-        LaterPay_Core_Logger::debug(
-            __METHOD__,
-            $context
-        );
-
+        
         header("Location: $link", true);
         exit;
     }
@@ -630,15 +576,6 @@ class LaterPay_Client
      * @return  void
      */
     public function set_token( $token, $redirect = false ) {
-        LaterPay_Core_Logger::debug( 'LaterPay_Client::set_token', array(
-                            'token'     => $token,
-                            'redirect'  => $redirect,
-                            'api_key'   => $this->api_key,
-                            'cp_key'    => $this->cp_key,
-                            'lptoken'   => $this->lptoken,
-                        )
-                    );
-
         $this->lptoken = $token;
         setcookie( $this->token_name, $token, strtotime( '+1 day' ), '/' );
         if ( $redirect ) {
@@ -653,12 +590,6 @@ class LaterPay_Client
 	 * @return  void
 	 */
 	public function delete_token() {
-        LaterPay_Core_Logger::debug( 'LaterPay_Client::delete_token', array(
-                            'api_key'   => $this->api_key,
-                            'cp_key'    => $this->cp_key,
-                            'lptoken'   => $this->lptoken,
-                        )
-                    );
 
         setcookie( $this->token_name, '', time() - 100000, '/' );
         unset( $_COOKIE[$this->token_name] );
@@ -675,14 +606,6 @@ class LaterPay_Client
      * @return  array $response
      */
     protected function make_request( $url, $params = array(), $method = LaterPay_Http_Client::GET ) {
-	    LaterPay_Core_Logger::debug( 'LaterPay_Client::make_request', array(
-                            'url'       => $url,
-                            'params'    => $params,
-                            'api_key'   => $this->api_key,
-                            'cp_key'    => $this->cp_key,
-                            'lptoken'   => $this->lptoken,
-                        )
-                    );
 
         // build the request
         $params = $this->sign_and_encode( $params, $url, $method );
@@ -691,28 +614,21 @@ class LaterPay_Client
             'User-Agent'      => 'LaterPay Client - PHP - v0.2',
         );
         try {
-            $http_client = new LaterPay_Http_Client();
-            $raw_response_body = $http_client->request($url, $headers, $params, $method);
-            $response = json_decode( $raw_response_body, true );
-
-            if ( $response['status'] == 'invalid_token' ) {
+            $raw_response_body = LaterPay_Http_Client::request($url, $headers, $params, $method);
+            $response = (array) json_decode( $raw_response_body, true );
+            if ( empty( $response ) ) {
+                throw new Exception('connection_error');
+            }
+            if ( isset($response['status']) && $response['status'] == 'invalid_token' ) {
                 $this->delete_token();
             }
             if ( array_key_exists( 'new_token', $response ) ) {
                 $this->set_token( $response['new_token'] );
             }
         } catch ( Exception $e ) {
-            LaterPay_Core_Logger::error( 'LaterPay_Client::make_request', array(
-                                'message'   => $e->getMessage(),
-                                'url'       => $url,
-                                'params'    => $params,
-                            )
-                        );
 
             $response = array( 'status' => 'connection_error' );
         }
-
-        LaterPay_Core_Logger::debug( 'LaterPay_Client::make_request', array( 'response' => $response ) );
 
         return $response;
     }
