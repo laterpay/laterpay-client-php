@@ -1,16 +1,26 @@
 <?php
 
 /**
- * Native HTTP transport
+ * Native HTTP transport.
  */
-class LaterPay_Http_Transport_Wp extends LaterPay_Http_Transport_Abstract implements LaterPay_Http_Transport {
+class LaterPay_Http_Transport_Wp extends LaterPay_Http_Transport_Abstract implements LaterPay_Http_Transport
+{
+
     /**
      * {@inheritdoc }
      */
     public function request( $url, $headers = array(), $data = array(), $options = array() ) {
-        if( isset( $options['type'] ) ){ $type = $options['type']; } else { $type = LaterPay_Http_Client::GET; }
-        if( isset( $options['timeout'] ) ){ $timeout = $options['timeout']; } else { $timeout = 30; }
-        if ( in_array( $type, array( LaterPay_Http_Client::HEAD, LaterPay_Http_Client::GET, LaterPay_Http_Client::DELETE ) ) & !empty( $data ) ) {
+        if ( isset( $options['type'] ) ) {
+            $type = $options['type'];
+        } else {
+            $type = LaterPay_Http_Client::GET;
+        }
+        if ( isset( $options['timeout'] ) ) {
+            $timeout = $options['timeout'];
+        } else {
+            $timeout = 30;
+        }
+        if ( in_array( $type, array( LaterPay_Http_Client::HEAD, LaterPay_Http_Client::GET, LaterPay_Http_Client::DELETE ) ) & ! empty( $data ) ) {
             $url = self::format_get( $url, $data );
             $data = '';
         } elseif ( ! empty( $data ) && ! is_string( $data ) ) {
@@ -30,6 +40,7 @@ class LaterPay_Http_Transport_Wp extends LaterPay_Http_Transport_Abstract implem
                 );
                 $response = wp_remote_retrieve_body( $raw_response );
                 break;
+
             default:
                 $raw_response = wp_remote_get(
                     $url,

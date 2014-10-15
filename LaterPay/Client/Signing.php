@@ -4,21 +4,24 @@ class LaterPay_Client_Signing
 {
 
 	/**
-	 * Contains the hash algorithm
+	 * Contains the hash algorithm.
 	 * @var string
 	 */
 	protected static $hashAlgo = 'sha224';
 
 	/**
-	 * @param   string $known_str
-	 * @param   string $given_str
-	 * @throws  InvalidArgumentException
+     * Todo: add description
      *
-	 * @return  bool
+	 * @param string   $known_str
+	 * @param string   $given_str
+     *
+	 * @throws InvalidArgumentException
+     *
+	 * @return boolean
 	 */
     protected static function time_independent_hmac_compare( $known_str, $given_str ) {
         if ( strlen( $known_str ) == 0 ) {
-            throw new InvalidArgumentException( 'This function cannot safely compare against an empty given string' );
+            throw new InvalidArgumentException( 'This function cannot safely compare against an empty given string.' );
         }
 
         $res = strlen( $given_str ) ^ strlen( $known_str );
@@ -33,10 +36,12 @@ class LaterPay_Client_Signing
     }
 
 	/**
-	 * @param   string $secret
-	 * @param   string $parts
+     * TODO: add description
      *
-	 * @return  string
+	 * @param string   $secret
+	 * @param string   $parts
+     *
+	 * @return string
 	 */
     protected static function create_hmac( $secret, $parts ) {
         if ( is_array( $parts ) ) {
@@ -53,14 +58,15 @@ class LaterPay_Client_Signing
     }
 
 	/**
-	 *
-	 * @param   string $signature
-	 * @param   string $secret
-	 * @param   array  $params
-	 * @param   string $url
-	 * @param   string $method
+	 * TODO: add description
      *
-	 * @return  bool
+	 * @param string   $signature
+	 * @param string   $secret
+	 * @param array    $params
+	 * @param string   $url
+	 * @param string   $method
+     *
+	 * @return boolean
 	 */
 	public static function verify( $signature, $secret, $params, $url, $method ) {
         if ( is_array( $signature ) ) {
@@ -75,7 +81,7 @@ class LaterPay_Client_Signing
     /**
      * Request parameter dictionaries are handled in different ways in different libraries,
      * this function is required to ensure we always have something of the format
-     * { key: [ value1, value2, ... ] }
+     * { key: [ value1, value2, ... ] }.
      *
      * @param array $params
      *
@@ -104,9 +110,9 @@ class LaterPay_Client_Signing
     /**
      * Create base message.
      *
-     * @param array  $params mapping of all parameters that should be signed
-     * @param string $url    full URL of the target endpoint, no URL parameters
-     * @param string $method
+     * @param array     $params mapping of all parameters that should be signed
+     * @param string    $url    full URL of the target endpoint, no URL parameters
+     * @param string    $method
      *
      * @return string
      */
@@ -147,22 +153,21 @@ class LaterPay_Client_Signing
     }
 
     /**
-     * Create signature for given 'params', 'url' and HTTP method.
+     * Create signature for given 'params', 'url', and HTTP method.
      *
      * How params are canonicalized:
      * - 'urllib.quote' every key and value that will be signed
-     * - sort the param list
+     * - sort the params list
      * - '&'-join the params
      *
-     * @param string $secret secret used to create signature
-     * @param array  $params mapping of all parameters that should be signed
-     * @param string $url    full URL of the target endpoint, no URL parameters
-     * @param string $method
+     * @param string    $secret secret used to create signature
+     * @param array     $params mapping of all parameters that should be signed
+     * @param string    $url    full URL of the target endpoint, no URL parameters
+     * @param string    $method
      *
      * @return string
      */
     protected static function sign( $secret, $params, $url, $method = LaterPay_Core_Request::POST ) {
-
         $secret = utf8_encode( $secret );
 
         if ( isset( $params['hmac'] ) ) {
@@ -186,10 +191,10 @@ class LaterPay_Client_Signing
      * It adds the signature to the URL as the URL parameter "hmac" and also adds the required timestamp parameter 'ts'
      * if it's not already in the 'params' dictionary. 'unicode()' instances in params are handled correctly.
      *
-     * @param string $secret
-     * @param array  $params
-     * @param string $url
-     * @param string $method HTTP method
+     * @param string    $secret
+     * @param array     $params
+     * @param string    $url
+     * @param string    $method HTTP method
      *
      * @return string query params
      */
