@@ -210,15 +210,17 @@ class LaterPay_Client
     }
 
     /**
-     * Get iframe API balance URL.
+     * Get iframe balance URL.
      *
-     * @deprecated since version 0.9.5
+     * @deprecated get_iframe_balance_url is deprecated. Please use get_controls_balance_url. 
+     * It will be removed on a future release.
      *
      * @param string|null $forcelang
      *
      * @return string $url
      */
     public function get_iframe_api_balance_url( $forcelang = null ) {
+        error_log('get_iframe_balance_url is deprecated. Please use get_controls_balance_url. It will be removed on a future release.');
         $data = array( 'cp' => $this->cp_key );
 
         if ( ! empty( $forcelang ) ) {
@@ -234,9 +236,7 @@ class LaterPay_Client
     }
 
     /**
-     * Get iframe API balance URL.
-     *
-     * @deprecated since version 0.9.5
+     * Get controls balance URL.
      *
      * @param string|null $forcelang
      *
