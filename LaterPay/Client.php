@@ -257,6 +257,43 @@ class LaterPay_Client
         return $url;
     }
 
+    /**
+     * Get account links URL.
+     *
+     * @param string|null $show
+     * @param string|null $css
+     * @param string|null $next
+     * @param string|null $forcelang
+     *
+     * @return string $url
+     */
+    public function get_account_links_url( $show = null, $css = null, $next = null, $forcelang = null ) {
+        $data = array( 'cp' => $this->cp_key );
+
+        if ( ! empty( $show ) ) {
+            $data['show'] = $show;
+        }
+
+        if ( ! empty( $css ) ) {
+            $data['css'] = $css;
+        }
+
+        if ( ! empty( $next ) ) {
+            $data['next'] = $next;
+        }
+
+        if ( ! empty( $forcelang ) ) {
+            $data['forcelang'] = $forcelang;
+        }
+
+        $data['xdmprefix'] = substr( uniqid( '', true ), 0, 10 );
+        $base_url   = $this->web_root . '/controls/links';
+        $params     = $this->sign_and_encode( $data, $base_url );
+        $url        = $base_url . '?' . $params;
+
+        return $url;
+    }
+
 	/**
      * TODO: add description
      *
