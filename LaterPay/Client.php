@@ -712,6 +712,7 @@ class LaterPay_Client
         $uri = preg_replace( '/hmac=.*?($|&)/', '', $uri );
 
         $uri = preg_replace( '/&$/', '', $uri );
+        $uri = preg_replace( '/\?$/', '', $uri );
 
         if ( $ssl ) {
             $pageURL = 'https://';
