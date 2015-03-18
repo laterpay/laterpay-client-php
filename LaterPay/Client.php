@@ -721,7 +721,7 @@ class LaterPay_Client
         }
         $serverName = $_SERVER['SERVER_NAME'];
         if ( $serverName == 'localhost' and function_exists('site_url')) {
-           $serverName = site_url(); // WP function 
+           $serverName = (str_replace(array('http://', 'https://'), '', site_url())) ; // WP function 
         }
         if ( ! $ssl && $_SERVER['SERVER_PORT'] != '80' ) {
             $pageURL .= $serverName . ':' . $_SERVER['SERVER_PORT'] . $uri;
