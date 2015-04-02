@@ -212,7 +212,7 @@ class LaterPay_Client
     /**
      * Get iframe balance URL.
      *
-     * @deprecated get_iframe_balance_url is deprecated. Please use get_controls_balance_url. 
+     * @deprecated get_iframe_balance_url is deprecated. Please use get_controls_balance_url.
      * It will be removed on a future release.
      *
      * @param string|null $forcelang
@@ -315,11 +315,11 @@ class LaterPay_Client
 	 */
 	public function get_login_dialog_url( $next_url, $use_jsevents = false ) {
         if ( $use_jsevents ) {
-            $aux = '"&jsevents=1';
+            $aux = '&jsevents=1';
         } else {
             $aux = '';
         }
-        $url = $this->web_root . '/dialog/login?next=' . urlencode( $next_url ) . $aux . '&cp=' . $this->cp_key;
+        $url = $this->web_root . '/account/dialog/login?next=' . urlencode( $next_url ) . $aux . '&cp=' . $this->cp_key;
 
         return $this->get_dialog_api_url( $url );
     }
@@ -334,11 +334,11 @@ class LaterPay_Client
 	 */
     public function get_signup_dialog_url( $next_url, $use_jsevents = false ) {
         if ( $use_jsevents ) {
-            $aux = '"&jsevents=1';
+            $aux = '&jsevents=1';
         } else {
             $aux = '';
         }
-        $url = $this->web_root . '/dialog/login?next=' . urlencode( $next_url ) . $aux . '&cp=' . $this->cp_key;
+        $url = $this->web_root . '/account/dialog/signup?next=' . urlencode( $next_url ) . $aux . '&cp=' . $this->cp_key;
 
         return $this->get_dialog_api_url( $url );
     }
@@ -353,11 +353,11 @@ class LaterPay_Client
 	 */
     public function get_logout_dialog_url( $next_url, $use_jsevents = false ) {
         if ( $use_jsevents ) {
-            $aux = '"&jsevents=1';
+            $aux = '&jsevents=1';
         } else {
             $aux = '';
         }
-        $url = $this->web_root . '/dialog/logout?next=' . urlencode( $next_url ) . $aux . '&cp=' . $this->cp_key;
+        $url = $this->web_root . '/account/dialog/logout?next=' . urlencode( $next_url ) . $aux . '&cp=' . $this->cp_key;
 
         return $this->get_dialog_api_url( $url );
     }
