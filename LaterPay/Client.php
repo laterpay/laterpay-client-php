@@ -766,7 +766,7 @@ class LaterPay_Client
                 throw new Exception('connection_error');
             }
         } catch ( Exception $e ) {
-            false;
+            return false;
         }
 
         return true;
