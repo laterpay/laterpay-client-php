@@ -745,4 +745,30 @@ class LaterPay_Client
         return $pageURL;
     }
 
+    /**
+     * Method to check url API availability.
+     *
+     * @param string        $url
+     * @param array         $params
+     * @param string        $method
+     *
+     * @return boolean
+     */
+    public function check_health( $url, $params = array(), $method = LaterPay_Http_Client::HEAD ) {
+        $params = $this->sign_and_encode( $params, $url, $method );
+        $headers = array(
+            'X-LP-APIVersion' => 2,
+            'User-Agent'      => 'LaterPay Client - PHP - v0.2',
+        );
+        try {
+            $response = (string) LaterPay_Http_Client::request($url, $headers, $params, $method);
+            if ( empty( $response ) ) {
+                throw new Exception('connection_error');
+            }
+        } catch ( Exception $e ) {
+            false;
+        }
+
+        return true;
+    }
 }
