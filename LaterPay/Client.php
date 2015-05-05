@@ -755,7 +755,9 @@ class LaterPay_Client
      * @return boolean
      */
     public function check_health( $url, $params = array(), $method = LaterPay_Http_Client::HEAD ) {
-        $params = $this->sign_and_encode( $params, $url, $method );
+        if ( ! empty( $params ) ) {
+            $params = $this->sign_and_encode( $params, $url, $method );
+        }
         $headers = array(
             'X-LP-APIVersion' => 2,
             'User-Agent'      => 'LaterPay Client - PHP - v0.2',
