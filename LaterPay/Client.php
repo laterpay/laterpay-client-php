@@ -764,9 +764,6 @@ class LaterPay_Client
         );
         try {
             $response = (string) LaterPay_Http_Client::request($url, $headers, $params, $method);
-            if ( empty( $response ) ) {
-                throw new Exception('connection_error');
-            }
         } catch ( Exception $e ) {
             return false;
         }
