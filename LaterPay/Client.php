@@ -108,6 +108,15 @@ class LaterPay_Client
     }
 
     /**
+     * Get health URL.
+     *
+     * @return string
+     */
+    private function _get_health_url() {
+        return $this->api_root . '/health';
+    }
+
+    /**
      * Get token redirect URL.
      *
      * @param string $return_to URL
@@ -745,4 +754,25 @@ class LaterPay_Client
         return $pageURL;
     }
 
+    /**
+     * Method to check url API availability.
+     *
+     * @return boolean
+     */
+    public function check_health() {
+        $headers = array(
+            'X-LP-APIVersion' => 2,
+            'User-Agent'      => 'LaterPay Client - PHP - v0.2',
+        );
+        $method = LaterPay_Http_Client::HEAD;
+        $url    = $this->_get_health_url();
+        $params = array();
+        try {
+            $response = (string) LaterPay_Http_Client::request($url, $headers, $params, $method);
+        } catch ( Exception $e ) {
+            return false;
+        }
+
+        return true;
+    }
 }
