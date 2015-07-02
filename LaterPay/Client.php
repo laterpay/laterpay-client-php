@@ -631,7 +631,7 @@ class LaterPay_Client
      */
     public function set_token( $token, $redirect = false ) {
         $this->lptoken = $token;
-        setcookie( $this->token_name, $token, strtotime( '+1 day' ), '/' );
+        @setcookie( $this->token_name, $token, strtotime( '+1 day' ), '/' );
         if ( $redirect ) {
             header( 'Location: ' . self::get_current_url(), true );
             exit();
@@ -644,7 +644,7 @@ class LaterPay_Client
 	 * @return void
 	 */
 	public function delete_token() {
-        setcookie( $this->token_name, '', time() - 100000, '/' );
+        @setcookie( $this->token_name, '', time() - 100000, '/' );
         unset( $_COOKIE[$this->token_name] );
         $this->token = null;
     }
