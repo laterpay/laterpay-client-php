@@ -113,7 +113,7 @@ class LaterPay_Client
      * @return string
      */
     private function _get_health_url() {
-        return $this->api_root . '/health';
+        return $this->api_root . '/validatesignature';
     }
 
     /**
@@ -764,11 +764,19 @@ class LaterPay_Client
             'X-LP-APIVersion' => 2,
             'User-Agent'      => 'LaterPay Client - PHP - v0.2',
         );
-        $method = LaterPay_Http_Client::HEAD;
+        $method = LaterPay_Http_Client::GET;
         $url    = $this->_get_health_url();
-        $params = array();
+        $params = $this->sign_and_encode(
+            array(
+                'salt'  => md5( microtime(true) ),
+                'cp'    => $this->cp_key,
+            ),
+            $url,
+            $method
+        );
+        $url .= '?' . $params;
         try {
-            $response = (string) LaterPay_Http_Client::request($url, $headers, $params, $method);
+            $response = (string) LaterPay_Http_Client::request($url, $headers, array(), $method);
         } catch ( Exception $e ) {
             return false;
         }
