@@ -108,6 +108,15 @@ class LaterPay_Client
     }
 
     /**
+     * Get health URL.
+     *
+     * @return string
+     */
+    private function _get_health_url() {
+        return $this->api_root . '/validatesignature';
+    }
+
+    /**
      * Get token redirect URL.
      *
      * @param string $return_to URL
@@ -212,7 +221,7 @@ class LaterPay_Client
     /**
      * Get iframe balance URL.
      *
-     * @deprecated get_iframe_balance_url is deprecated. Please use get_controls_balance_url. 
+     * @deprecated get_iframe_balance_url is deprecated. Please use get_controls_balance_url.
      * It will be removed on a future release.
      *
      * @param string|null $forcelang
@@ -315,11 +324,11 @@ class LaterPay_Client
 	 */
 	public function get_login_dialog_url( $next_url, $use_jsevents = false ) {
         if ( $use_jsevents ) {
-            $aux = '"&jsevents=1';
+            $aux = '&jsevents=1';
         } else {
             $aux = '';
         }
-        $url = $this->web_root . '/dialog/login?next=' . urlencode( $next_url ) . $aux . '&cp=' . $this->cp_key;
+        $url = $this->web_root . '/account/dialog/login?next=' . urlencode( $next_url ) . $aux . '&cp=' . $this->cp_key;
 
         return $this->get_dialog_api_url( $url );
     }
@@ -334,11 +343,11 @@ class LaterPay_Client
 	 */
     public function get_signup_dialog_url( $next_url, $use_jsevents = false ) {
         if ( $use_jsevents ) {
-            $aux = '"&jsevents=1';
+            $aux = '&jsevents=1';
         } else {
             $aux = '';
         }
-        $url = $this->web_root . '/dialog/login?next=' . urlencode( $next_url ) . $aux . '&cp=' . $this->cp_key;
+        $url = $this->web_root . '/account/dialog/signup?next=' . urlencode( $next_url ) . $aux . '&cp=' . $this->cp_key;
 
         return $this->get_dialog_api_url( $url );
     }
@@ -353,11 +362,11 @@ class LaterPay_Client
 	 */
     public function get_logout_dialog_url( $next_url, $use_jsevents = false ) {
         if ( $use_jsevents ) {
-            $aux = '"&jsevents=1';
+            $aux = '&jsevents=1';
         } else {
             $aux = '';
         }
-        $url = $this->web_root . '/dialog/logout?next=' . urlencode( $next_url ) . $aux . '&cp=' . $this->cp_key;
+        $url = $this->web_root . '/account/dialog/logout?next=' . urlencode( $next_url ) . $aux . '&cp=' . $this->cp_key;
 
         return $this->get_dialog_api_url( $url );
     }
@@ -622,7 +631,7 @@ class LaterPay_Client
      */
     public function set_token( $token, $redirect = false ) {
         $this->lptoken = $token;
-        setcookie( $this->token_name, $token, strtotime( '+1 day' ), '/' );
+        @setcookie( $this->token_name, $token, strtotime( '+1 day' ), '/' );
         if ( $redirect ) {
             header( 'Location: ' . self::get_current_url(), true );
             exit();
@@ -635,7 +644,7 @@ class LaterPay_Client
 	 * @return void
 	 */
 	public function delete_token() {
-        setcookie( $this->token_name, '', time() - 100000, '/' );
+        @setcookie( $this->token_name, '', time() - 100000, '/' );
         unset( $_COOKIE[$this->token_name] );
         $this->token = null;
     }
@@ -691,6 +700,10 @@ class LaterPay_Client
      */
     public static function get_current_url() {
         $ssl = isset( $_SERVER['HTTPS'] ) && $_SERVER['HTTPS'] == 'on';
+        // Check for Cloudflare Universal SSL / flexible SSL
+        if ( isset( $_SERVER['HTTP_CF_VISITOR'] ) && strpos( $_SERVER['HTTP_CF_VISITOR'], 'https' ) !== false ) {
+            $ssl = true;
+        }
         $uri = $_SERVER['REQUEST_URI'];
 
         // process Ajax requests
@@ -719,15 +732,55 @@ class LaterPay_Client
         } else {
             $pageURL = 'http://';
         }
-        if ( ! $ssl && $_SERVER['SERVER_PORT'] != '80' ) {
-            $pageURL .= $_SERVER['SERVER_NAME'] . ':' . $_SERVER['SERVER_PORT'] . $uri;
-        } else if ( $ssl && $_SERVER['SERVER_PORT'] != '443' ) {
-            $pageURL .= $_SERVER['SERVER_NAME'] . ':' . $_SERVER['SERVER_PORT'] . $uri;
+        $serverPort = $_SERVER['SERVER_PORT'];
+        $serverName = $_SERVER['SERVER_NAME'];
+        if ( $serverName == 'localhost' and function_exists('site_url')) {
+            $serverName = (str_replace(array('http://', 'https://'), '', site_url())) ; // WP function 
+            // overwrite port on Heroku 
+            if ( isset( $_SERVER['HTTP_CF_VISITOR'] ) && strpos( $_SERVER['HTTP_CF_VISITOR'], 'https' ) !== false ) {
+                $serverPort = 443;
+            } else {
+                $serverPort = 80;
+            }
+        }
+        if ( ! $ssl && $serverPort != '80' ) {
+            $pageURL .= $serverName . ':' . $serverPort . $uri;
+        } else if ( $ssl && $serverPort != '443' ) {
+            $pageURL .= $serverName . ':' . $serverPort . $uri;
         } else {
-            $pageURL .= $_SERVER['SERVER_NAME'] . $uri;
+            $pageURL .= $serverName . $uri;
         }
 
         return $pageURL;
     }
 
+    /**
+     * Method to check url API availability.
+     *
+     * @return boolean
+     */
+    public function check_health() {
+        $headers = array(
+            'X-LP-APIVersion' => 2,
+            'User-Agent'      => 'LaterPay Client - PHP - v0.2',
+        );
+        $method = LaterPay_Http_Client::GET;
+        $url    = $this->_get_health_url();
+        $params = $this->sign_and_encode(
+            array(
+                'salt'  => md5( microtime(true) ),
+                'cp'    => $this->cp_key,
+            ),
+            $url,
+            $method
+        );
+        $url .= '?' . $params;
+        try {
+            $response = (string) LaterPay_Http_Client::request($url, $headers, array(), $method);
+        } catch ( Exception $e ) {
+            return false;
+        }
+
+        return true;
+    }
 }
