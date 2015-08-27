@@ -40,9 +40,16 @@ class LaterPay_Http_Transport_Curl extends LaterPay_Http_Transport_Abstract impl
                 curl_setopt( $ch, CURLOPT_POSTFIELDS, $data );
                 break;
         }
-        $response = (string) curl_exec( $ch );
 
+        $response      = (string) curl_exec( $ch );
+        $error_message = curl_error( $ch );
         curl_close( $ch );
+
+        if ( ! empty( $error_message ) ) {
+            throw new Exception(
+                $error_message
+            );
+        }
 
         return $response;
     }

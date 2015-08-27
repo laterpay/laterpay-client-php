@@ -22,7 +22,7 @@ class LaterPay_Http_Transport_Native extends LaterPay_Http_Transport_Abstract im
         if ( in_array( $type, array( LaterPay_Http_Client::HEAD, LaterPay_Http_Client::GET, LaterPay_Http_Client::DELETE ) ) & ! empty( $data ) ) {
             $url = self::format_get( $url, $data );
             $data = '';
-        } elseif ( !empty( $data ) && !is_string( $data ) ) {
+        } elseif ( ! empty( $data ) && ! is_string( $data ) ) {
             $data = http_build_query( $data, null, '&' );
         }
         switch ( $type ) {
@@ -39,6 +39,12 @@ class LaterPay_Http_Transport_Native extends LaterPay_Http_Transport_Abstract im
         $stream_options['http']['method'] = $type;
         $context  = stream_context_create( $stream_options );
         $response = file_get_contents( $url, null, $context );
+
+        if ( $response === false ) {
+            throw new Exception(
+                'Could not resolve host.'
+            );
+        }
 
         return $response;
     }

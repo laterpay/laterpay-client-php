@@ -53,11 +53,11 @@ class LaterPay_Http_Transport_Wp extends LaterPay_Http_Transport_Abstract implem
                 break;
         }
 
-        $error_code = wp_remote_retrieve_response_code( $raw_response );
-        if ( $error_code > 400 ) {
+        $response_code = wp_remote_retrieve_response_code( $raw_response );
+
+        if ( empty( $response_code ) ) {
             throw new Exception(
-                wp_remote_retrieve_response_message( $raw_response ),
-                $error_code
+                wp_remote_retrieve_response_message( $raw_response )
             );
         }
 
