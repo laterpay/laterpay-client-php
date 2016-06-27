@@ -413,7 +413,7 @@ class LaterPay_Client
         $params = $this->sign_and_encode( $data, $base_url, LaterPay_Http_Client::GET );
         $url    = $base_url . '?' . $params;
 
-        return $this->get_dialog_api_url( $url );
+        return $url;
     }
 
 	/**
