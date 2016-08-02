@@ -581,11 +581,15 @@ class LaterPay_Client
      * @param array         $article_ids    array with posts ids
      * @param null|string   $product_key    array with posts ids
      *
-     * @return string json string response
+     * @return array response
      */
     public function get_access( $article_ids, $product_key = null ) {
         if ( ! is_array( $article_ids ) ) {
             $article_ids = array( $article_ids );
+        }
+
+        if ( ! $this->lptoken || empty( $article_ids ) ) {
+            return array();
         }
 
         $params = array(
@@ -593,13 +597,12 @@ class LaterPay_Client
             'cp'         => $this->cp_key,
             'article_id' => $article_ids,
         );
+
         if ( ! empty( $product_key ) ) {
             $params['product'] = $product_key;
         }
-        $data = $this->make_request( $this->_get_access_url(), $params );
-        $allowed_statuses = array( 'ok', 'invalid_token', 'connection_error' );
 
-        return $data;
+        return $this->make_request( $this->_get_access_url(), $params );
     }
 
     /**
