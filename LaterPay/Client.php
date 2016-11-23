@@ -159,92 +159,6 @@ class LaterPay_Client
     }
 
     /**
-     * Get iframe API URL.
-     *
-     * TODO: 1 array as param ...
-     *
-     * @param string    $next_url
-     * @param string    $css_url
-     * @param string    $forcelang
-     * @param boolean   $show_greeting
-     * @param boolean   $show_long_greeting
-     * @param boolean   $show_login
-     * @param boolean   $show_signup
-     * @param boolean   $show_long_signup
-     * @param boolean   $use_jsevents
-     *
-     * @return string URL
-     */
-    public function get_iframe_api_url( $next_url, $css_url = null, $forcelang = null, $show_greeting = false, $show_long_greeting = false, $show_login = false, $show_signup = false, $show_long_signup = false, $use_jsevents = false ) {
-        $data = array( 'next' => $next_url );
-        $data['cp'] = $this->cp_key;
-        if ( ! empty( $forcelang ) ) {
-            $data['forcelang'] = $forcelang;
-        }
-        if ( ! empty( $css_url ) ) {
-            $data['css'] = $css_url;
-        }
-        if ( $use_jsevents ) {
-            $data['jsevents'] = '1';
-        }
-        if ( $show_long_greeting ) {
-            if ( ! isset( $data['show'] ) ) {
-                $data['show'] = 'gg';
-            }
-        } elseif ( $show_greeting ) {
-            if ( ! isset( $data['show'] ) ) {
-                $data['show'] = 'g';
-            }
-        }
-        if ( $show_login ) {
-            if ( ! isset( $data['show'] ) ) {
-                $data['show'] = 'l';
-            }
-        }
-        if ( $show_long_signup ) {
-            if ( ! isset( $data['show'] ) ) {
-                $data['show'] = 'ss';
-            }
-        } elseif ( $show_signup ) {
-            if ( ! isset( $data['show'] ) ) {
-                $data['show'] = 's';
-            }
-        }
-        $data['xdmprefix'] = substr( uniqid( '', true ), 0, 10 );
-
-        $url    = $this->web_root . '/iframeapi/links';
-        $params = $this->sign_and_encode( $data, $url, LaterPay_Http_Client::GET );
-
-        return join( '?', array( $url, $params ) );
-    }
-
-    /**
-     * Get iframe balance URL.
-     *
-     * @deprecated get_iframe_balance_url is deprecated. Please use get_controls_balance_url.
-     * It will be removed on a future release.
-     *
-     * @param string|null $forcelang
-     *
-     * @return string $url
-     */
-    public function get_iframe_api_balance_url( $forcelang = null ) {
-        error_log('get_iframe_balance_url is deprecated. Please use get_controls_balance_url. It will be removed on a future release.');
-        $data = array( 'cp' => $this->cp_key );
-
-        if ( ! empty( $forcelang ) ) {
-            $data['forcelang'] = $forcelang;
-        }
-
-        $data['xdmprefix'] = substr( uniqid( '', true ), 0, 10 );
-        $base_url   = $this->web_root . '/iframeapi/balance';
-        $params     = $this->sign_and_encode( $data, $base_url );
-        $url        = $base_url . '?' . $params;
-
-        return $url;
-    }
-
-    /**
      * Get controls balance URL.
      *
      * @param string|null $forcelang
@@ -269,38 +183,42 @@ class LaterPay_Client
     /**
      * Get account links URL.
      *
-     * @param string|null $show
-     * @param string|null $css
-     * @param string|null $next
+     * @param string|null $show          Possible options: ('g', 'gg', 'l', 's', 'ss') or combination of them
+     * @param string|null $css_url
+     * @param string|null $next_url
      * @param string|null $forcelang
+     * @param bool        $use_jsevents
      *
-     * @return string $url
+     * @return string URL
      */
-    public function get_account_links_url( $show = null, $css = null, $next = null, $forcelang = null ) {
-        $data = array( 'cp' => $this->cp_key );
-
-        if ( ! empty( $show ) ) {
-            $data['show'] = $show;
-        }
-
-        if ( ! empty( $css ) ) {
-            $data['css'] = $css;
-        }
-
-        if ( ! empty( $next ) ) {
-            $data['next'] = $next;
-        }
+    public function get_account_links( $show = null, $css_url = null, $next_url = null, $forcelang = null, $use_jsevents = false ) {
+        $data = array(
+            'next' => $next_url,
+            'cp'   => $this->cp_key
+        );
 
         if ( ! empty( $forcelang ) ) {
             $data['forcelang'] = $forcelang;
         }
 
-        $data['xdmprefix'] = substr( uniqid( '', true ), 0, 10 );
-        $base_url   = $this->web_root . '/controls/links';
-        $params     = $this->sign_and_encode( $data, $base_url );
-        $url        = $base_url . '?' . $params;
+        if ( ! empty( $css_url ) ) {
+            $data['css'] = $css_url;
+        }
 
-        return $url;
+        if ( ! empty( $show ) ) {
+            $data['show'] = $show;
+        }
+
+        if ( $use_jsevents ) {
+            $data['jsevents'] = '1';
+        }
+
+        $data['xdmprefix'] = substr( uniqid( '', true ), 0, 10 );
+
+        $url    = $this->web_root . '/controls/links';
+        $params = $this->sign_and_encode( $data, $url );
+
+        return join( '?', array( $url, $params ) );
     }
 
 	/**
@@ -779,7 +697,7 @@ class LaterPay_Client
         );
         $url .= '?' . $params;
         try {
-            $response = (string) LaterPay_Http_Client::request($url, $headers, array(), $method);
+            LaterPay_Http_Client::request($url, $headers, array(), $method);
         } catch ( Exception $e ) {
             return false;
         }
