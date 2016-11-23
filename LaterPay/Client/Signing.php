@@ -236,4 +236,27 @@ class LaterPay_Client_Signing
         return $encoded . '&hmac=' . $hmac;
     }
 
+    public static function sign_jwt( $payload, $key ) {
+
+        $header  = array(
+            'typ' => 'JWT',
+            'alg' => 'HS256',
+        );
+
+        $data   = array();
+        $data[] = self::encode_jwt_data( $header );
+        $data[] = self::encode_jwt_data( $payload );
+        $data[] = self::base64url_encode( hash_hmac( 'sha256', join( '.', $data ), $key, true ) );
+
+        return join( '.', $data );
+    }
+
+    protected function encode_jwt_data( $data ) {
+        return self::base64url_encode( json_encode( $data ) );
+    }
+
+    protected function base64url_encode( $data ) {
+        return str_replace( '=', '', strtr( base64_encode( $data ), '+/', '-_' ) );
+    }
+
 }

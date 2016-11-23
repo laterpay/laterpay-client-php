@@ -88,17 +88,6 @@ class LaterPay_Client
     }
 
     /**
-     * Get identify URL.
-     *
-     * @return string
-     */
-    private function _get_identify_url() {
-        $url = $this->api_root . '/identify';
-
-        return $url;
-    }
-
-    /**
      * Get token URL.
      *
      * @return string
@@ -141,21 +130,21 @@ class LaterPay_Client
     /**
      * Get identify URL.
      *
-     * @param string $identify_callback
+     * @param string $back_url
      *
      * @return string
      */
-    public function get_identify_url( $identify_callback = null ) {
-        $url = $this->_get_identify_url();
+    public function get_identify_url( $back_url, $content_ids ) {
+        $url = $this->web_root . '/ident';
 
-        $data = array( 'cp' => $this->cp_key );
-        if ( ! empty( $identify_callback ) ) {
-            $data['callback_url'] = $identify_callback;
-        }
-        $params = $this->sign_and_encode( $data, $url, LaterPay_Http_Client::GET );
-        $url .= '?' . $params;
+        $payload = array(
+            'back' => $back_url,
+            'ids'  => $content_ids
+        );
 
-        return $url;
+        $jwt_token = LaterPay_Client_Signing::sign_jwt( $payload, $this->api_key );
+
+        return $url . '/' . $this->cp_key . '/' . $jwt_token;
     }
 
     /**
@@ -308,15 +297,20 @@ class LaterPay_Client
         if ( $use_jsevents ) {
             $data['jsevents'] = 1;
         }
+
         if ( $transaction_reference ) {
             if ( strlen( $transaction_reference ) < 6 ) {
                 // throw new Exception( 'Transaction reference is not unique enough.' );
             }
             $data['tref'] = $transaction_reference;
         }
+
         if ( $skip_add_to_invoice ) {
             $data['skip_add_to_invoice'] = 1;
         }
+
+        // force to return lptoken
+        $data['return_lptoken'] = 1;
 
         if ( $dialog ) {
             $prefix = $this->web_root . '/dialog';
