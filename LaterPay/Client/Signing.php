@@ -236,6 +236,14 @@ class LaterPay_Client_Signing
         return $encoded . '&hmac=' . $hmac;
     }
 
+    /**
+     * Sign JWT token
+     *
+     * @param $payload
+     * @param $key
+     *
+     * @return string
+     */
     public static function sign_jwt( $payload, $key ) {
 
         $header  = array(
@@ -251,11 +259,25 @@ class LaterPay_Client_Signing
         return join( '.', $data );
     }
 
-    protected function encode_jwt_data( $data ) {
+    /**
+     * Encode JWT data
+     *
+     * @param $data
+     *
+     * @return string
+     */
+    protected static function encode_jwt_data( $data ) {
         return self::base64url_encode( json_encode( $data ) );
     }
 
-    protected function base64url_encode( $data ) {
+    /**
+     * Urlsafe base64encode
+     *
+     * @param $data
+     *
+     * @return string
+     */
+    protected static function base64url_encode( $data ) {
         return str_replace( '=', '', strtr( base64_encode( $data ), '+/', '-_' ) );
     }
 
