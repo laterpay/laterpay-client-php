@@ -9,40 +9,40 @@ class LaterPay_Client
      */
     protected $api_key;
 
-	/**
+    /**
      * Backend API root
      *
-	 * @var string
-	 */
-	protected $api_root;
+     * @var string
+     */
+    protected $api_root;
 
-	/**
+    /**
      * Dialog API root
      *
-	 * @var string
-	 */
-	protected $web_root;
+     * @var string
+     */
+    protected $web_root;
 
-	/**
+    /**
      * Merchant Id
      *
-	 * @var string
-	 */
-	protected $cp_key;
+     * @var string
+     */
+    protected $cp_key;
 
-	/**
+    /**
      * Lptoken value
      *
-	 * @var null|string
-	 */
-	protected $lptoken = null;
+     * @var null|string
+     */
+    protected $lptoken = null;
 
-	/**
+    /**
      * Lptoken toke name
      *
-	 * @var string
-	 */
-	protected $token_name = 'laterpay_token';
+     * @var string
+     */
+    protected $token_name = 'laterpay_token';
 
     /**
      * LaterPay_Client constructor.
@@ -68,12 +68,12 @@ class LaterPay_Client
         }
     }
 
-	/**
+    /**
      * Get lptoken
      *
-	 * @return null|string
-	 */
-	public function get_laterpay_token()
+     * @return null|string
+     */
+    public function get_laterpay_token()
     {
         return $this->lptoken;
     }
@@ -227,27 +227,27 @@ class LaterPay_Client
         return join( '?', array( $url, $params ) );
     }
 
-	/**
+    /**
      * Get dialog API url
      *
-	 * @param string $url
+     * @param string $url
      *
-	 * @return string
-	 */
-	protected function get_dialog_api_url( $url )
+     * @return string
+     */
+    protected function get_dialog_api_url( $url )
     {
         return $this->web_root . '/dialog-api?url=' . urlencode( $url );
     }
 
-	/**
+    /**
      * Get URL for the LaterPay login form.
      *
-	 * @param string   $next_url
-	 * @param boolean  $use_jsevents
+     * @param string   $next_url
+     * @param boolean  $use_jsevents
      *
-	 * @return string $url
-	 */
-	public function get_login_dialog_url( $next_url, $use_jsevents = false )
+     * @return string $url
+     */
+    public function get_login_dialog_url( $next_url, $use_jsevents = false )
     {
         if ( $use_jsevents ) {
             $aux = '&jsevents=1';
@@ -259,14 +259,14 @@ class LaterPay_Client
         return $this->get_dialog_api_url( $url );
     }
 
-	/**
+    /**
      * Get URL for the LaterPay signup form.
      *
-	 * @param string   $next_url
-	 * @param boolean  $use_jsevents
+     * @param string   $next_url
+     * @param boolean  $use_jsevents
      *
-	 * @return string $url
-	 */
+     * @return string $url
+     */
     public function get_signup_dialog_url( $next_url, $use_jsevents = false )
     {
         if ( $use_jsevents ) {
@@ -279,14 +279,14 @@ class LaterPay_Client
         return $this->get_dialog_api_url( $url );
     }
 
-	/**
+    /**
      * Get URL for logging out a user from LaterPay.
      *
-	 * @param string   $next_url
-	 * @param boolean  $use_jsevents
+     * @param string   $next_url
+     * @param boolean  $use_jsevents
      *
-	 * @return string $url
-	 */
+     * @return string $url
+     */
     public function get_logout_dialog_url( $next_url, $use_jsevents = false )
     {
         if ( $use_jsevents ) {
@@ -299,15 +299,15 @@ class LaterPay_Client
         return $this->get_dialog_api_url( $url );
     }
 
-	/**
+    /**
      * Build puchase url
-	 *
-	 * @param array  $data
+     *
+     * @param array  $data
      * @param string $endpoint
-	 * @param array  $options
-	 *
-	 * @return string $url
-	 */
+     * @param array  $options
+     *
+     * @return string $url
+     */
     protected function get_web_url( array $data, $endpoint, $options = array() )
     {
         $default_options = array(
@@ -346,28 +346,28 @@ class LaterPay_Client
         return $url;
     }
 
-	/**
+    /**
      * Get purchase url for Pay Now revenue
-	 *
-	 * @param array $data
-	 * @param array $options
-	 *
-	 * @return string $url
-	 */
-	public function get_buy_url( $data, $options = array() )
-    {
-        return $this->get_web_url( $data, 'buy', $options );
-    }
-
-	/**
-	 * Get purchase url for Pay Later revenue
-	 *
+     *
      * @param array $data
      * @param array $options
      *
      * @return string $url
      */
-	public function get_add_url( $data, $options = array() )
+    public function get_buy_url( $data, $options = array() )
+    {
+        return $this->get_web_url( $data, 'buy', $options );
+    }
+
+    /**
+     * Get purchase url for Pay Later revenue
+     *
+     * @param array $data
+     * @param array $options
+     *
+     * @return string $url
+     */
+    public function get_add_url( $data, $options = array() )
     {
         return $this->get_web_url( $data, 'add', $options );
     }
@@ -458,12 +458,12 @@ class LaterPay_Client
         }
     }
 
-	/**
-	 * Delete the token from cookies.
+    /**
+     * Delete the token from cookies.
      *
-	 * @return void
-	 */
-	public function delete_token()
+     * @return void
+     */
+    public function delete_token()
     {
         @setcookie( $this->token_name, '', time() - 100000, '/' );
         unset( $_COOKIE[$this->token_name] );
@@ -507,11 +507,11 @@ class LaterPay_Client
     }
 
     /**
-	 * Check if the current request is an Ajax request.
+     * Check if the current request is an Ajax request.
      *
-	 * @return bool
-	 */
-	public static function is_ajax()
+     * @return bool
+     */
+    public static function is_ajax()
     {
         return ! empty( $_SERVER['HTTP_X_REQUESTED_WITH'] ) && strtolower( $_SERVER['HTTP_X_REQUESTED_WITH'] ) == 'xmlhttprequest';
     }
