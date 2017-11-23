@@ -456,10 +456,9 @@ class Crypt_RSA {
      * Crypt_RSA doesn't do it is because OpenSSL doesn't fail gracefully.  openssl_pkey_new(), in particular, requires
      * openssl.cnf be present somewhere and, unfortunately, the only real way to find out is too late.
      *
-     * @return Crypt_RSA
      * @access public
      */
-    function Crypt_RSA()
+    function __construct()
     {
         if (! class_exists('Math_BigInteger')) {
             require_once('Math/BigInteger.php');

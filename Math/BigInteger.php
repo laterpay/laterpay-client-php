@@ -253,10 +253,9 @@ class Math_BigInteger {
      *
      * @param optional $x base-10 number or base-$base number if $base set.
      * @param optional integer $base
-     * @return Math_BigInteger
      * @access public
      */
-    function Math_BigInteger($x = 0, $base = 10)
+    function __construct($x = 0, $base = 10)
     {
         if ( ! defined('MATH_BIGINTEGER_MODE') ) {
             switch (true) {

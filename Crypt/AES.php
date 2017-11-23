@@ -172,10 +172,9 @@ class Crypt_AES extends Crypt_Rijndael {
      * CRYPT_AES_MODE_ECB or CRYPT_AES_MODE_CBC.  If not explictly set, CRYPT_AES_MODE_CBC will be used.
      *
      * @param optional Integer $mode
-     * @return Crypt_AES
      * @access public
      */
-    function Crypt_AES($mode = CRYPT_AES_MODE_CBC)
+    function __construct($mode = CRYPT_AES_MODE_CBC)
     {
         if ( ! defined('CRYPT_AES_MODE') ) {
             switch (true) {
@@ -237,9 +236,8 @@ class Crypt_AES extends Crypt_Rijndael {
         }
 
         if (CRYPT_AES_MODE == CRYPT_AES_MODE_INTERNAL) {
-            parent::Crypt_Rijndael($this->mode);
+            parent::__construct($this->mode);
         }
-
     }
 
     /**
