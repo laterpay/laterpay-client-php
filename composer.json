@@ -1,13 +1,15 @@
 {
-    "name" : "laterpay/laterpay-client-php",
-    "type": "library",
-    "license": "MIT",
-    "description": "LaterPay PHP Client",
-    "autoload": {
-        "psr-0": {
-            "LaterPay_": "",
-            "Crypt_": "",
-            "Math_" : ""
-        }
+  "name": "laterpay/laterpay-client-php",
+  "type": "library",
+  "version": "0.0.3",
+  "license": "MIT",
+  "description": "LaterPay PHP Client",
+  "require": {
+    "php": "^5.3"
+  },
+  "autoload": {
+    "psr-4": {
+      "LaterPayClient\\": "src/"
     }
+  }
 }
