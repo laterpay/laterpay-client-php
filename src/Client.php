@@ -14,7 +14,6 @@ use LaterPayClient\Http\TransportInterface;
  */
 class Client
 {
-
     /**
      * URLs depends on region and live/sandbox mode.
      *
@@ -201,6 +200,24 @@ class Client
     }
 
     /**
+     * Set cookie with token.
+     *
+     * @param string $token token key
+     *
+     * @return self
+     */
+    public function setToken($token)
+    {
+        $this->token = $token;
+
+        if ( ! headers_sent()) {
+            setcookie(static::$tokenName, $token, strtotime('+1 day'), '/');
+        }
+
+        return $this;
+    }
+
+    /**
      * Get LaterPay token value
      *
      * @return null|string
@@ -208,6 +225,43 @@ class Client
     public function getToken()
     {
         return $this->token;
+    }
+
+    /**
+     * @param $name
+     *
+     * @return self
+     */
+    public function setTokenName($name)
+    {
+        static::$tokenName = $name;
+        $this->checkTokenInCookie();
+
+        return $this;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getTokenName()
+    {
+        return static::$tokenName;
+    }
+
+    /**
+     * Delete the token from cookies.
+     *
+     * @return self
+     */
+    public function deleteToken()
+    {
+        if ( ! headers_sent()) {
+            setcookie(static::$tokenName, '', time() - 100000, '/');
+        }
+
+        unset($_COOKIE[static::$tokenName], $this->token);
+
+        return $this;
     }
 
     /**
@@ -240,27 +294,6 @@ class Client
     public function getRegion()
     {
         return $this->region;
-    }
-
-    /**
-     * @param $name
-     *
-     * @return self
-     */
-    public function setTokenName($name)
-    {
-        static::$tokenName = $name;
-        $this->checkTokenInCookie();
-
-        return $this;
-    }
-
-    /**
-     * @return null|string
-     */
-    public function getTokenName()
-    {
-        return static::$tokenName;
     }
 
     /**
@@ -334,36 +367,6 @@ class Client
     public function getAPIKey()
     {
         return $this->APIKey;
-    }
-
-    /**
-     * Get access URL.
-     *
-     * @return string
-     */
-    public function getAccessURL()
-    {
-        return $this->rootURL . '/access';
-    }
-
-    /**
-     * Get token URL.
-     *
-     * @return string
-     */
-    public function getTokenURL()
-    {
-        return $this->rootURL . '/gettoken';
-    }
-
-    /**
-     * Get health URL.
-     *
-     * @return string
-     */
-    public function getHealthURL()
-    {
-        return $this->rootURL . '/validatesignature';
     }
 
     /**
@@ -500,6 +503,36 @@ class Client
     }
 
     /**
+     * Get access URL.
+     *
+     * @return string
+     */
+    public function getAccessURL()
+    {
+        return $this->rootURL . '/access';
+    }
+
+    /**
+     * Get token URL.
+     *
+     * @return string
+     */
+    public function getTokenURL()
+    {
+        return $this->rootURL . '/gettoken';
+    }
+
+    /**
+     * Get health URL.
+     *
+     * @return string
+     */
+    public function getHealthURL()
+    {
+        return $this->rootURL . '/validatesignature';
+    }
+
+    /**
      * Get dialog API url
      *
      * @param string $returnURL
@@ -632,54 +665,70 @@ class Client
     }
 
     /**
-     * Get purchase url for subscriptions
+     * Get purchase url for subscriptions.
      *
      * @param $data
      * @param array $options
      *
      * @return string
      */
-    public function getSubscriptionURL($data, array $options = array())
+    public function getSubscriptionURL(array $data, array $options = array())
     {
         return $this->getWebURL($data, 'subscribe', $options);
     }
 
     /**
-     * Sign and encode all request parameters.
+     * Get URL for donations.
      *
-     * @param array $params
-     * @param $url
-     * @param string $method
+     * @param array $data
+     * @param array $options
      *
-     * @return string query params
+     * @return string
      */
-    public function signAndEncode(array $params = array(), $url, $method = Request::GET)
+    public function getDonateURL(array $data, array $options = array())
     {
-        return Signing::signAndEncode($this->APIKey, $params, $url, $method);
+        $postfix = isset($options['model']) && $options['model'] === 'sis' ? 'pay_now' : 'pay_later';
+
+        return $this->getWebURL($data, 'donate/' . $postfix, $options);
+    }
+
+    /**
+     * Get URL for contributions.
+     *
+     * @param array $data
+     * @param array $options
+     *
+     * @return string
+     */
+    public function getContributeURL(array $data, array $options = array())
+    {
+        $postfix = isset($options['model']) && $options['model'] === 'sis' ? 'pay_now' : 'pay_later';
+
+        return $this->getWebURL($data, 'contribute/' . $postfix, $options);
     }
 
     /**
      * Check if user has access to a given item / given array of items.
      *
-     * @param array $ids array with posts ids
+     * @param array|string $IDs array with posts ids
      * @param null|string $productKey
      *
      * @return array response
      *
      * @throws \RuntimeException
      */
-    public function getAccess($ids, $productKey = null)
+    public function getAccess($IDs, $productKey = null)
     {
-        $ids = (array)$ids;
+        $IDs = (array)$IDs;
 
-        if ( ! $this->token || empty($ids)) {
+        if ( ! $this->token || empty($IDs)) {
             return array();
         }
 
         $params = array(
             'lptoken'    => $this->token,
             'cp'         => $this->merchantID,
-            'article_id' => $ids,
+            'article_id' => $IDs,
         );
 
         if (null !== $productKey) {
@@ -700,40 +749,6 @@ class Client
     {
         header('Location: ' . $this->getTokenRedirectURL($url));
         exit;
-    }
-
-    /**
-     * Set cookie with token.
-     *
-     * @param string $token token key
-     *
-     * @return self
-     */
-    public function setToken($token)
-    {
-        $this->token = $token;
-
-        if ( ! headers_sent()) {
-            setcookie(static::$tokenName, $token, strtotime('+1 day'), '/');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Delete the token from cookies.
-     *
-     * @return self
-     */
-    public function deleteToken()
-    {
-        if ( ! headers_sent()) {
-            setcookie(static::$tokenName, '', time() - 100000, '/');
-        }
-
-        unset($_COOKIE[static::$tokenName], $this->token);
-
-        return $this;
     }
 
     /**
@@ -781,6 +796,20 @@ class Client
         }
 
         return $response;
+    }
+
+    /**
+     * Sign and encode all request parameters.
+     *
+     * @param array $params
+     * @param $url
+     * @param string $method
+     *
+     * @return string query params
+     */
+    public function signAndEncode(array $params = array(), $url, $method = Request::GET)
+    {
+        return Signing::signAndEncode($this->APIKey, $params, $url, $method);
     }
 
     /**

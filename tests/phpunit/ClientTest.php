@@ -133,6 +133,9 @@ class ClientTest extends TestCase
         $this->assertNotEmpty($client->getControlsBalanceURL());
         $this->assertNotEmpty($client->getAddURL(array('1')));
         $this->assertNotEmpty($client->getBuyURL(array('1')));
+        $this->assertNotEmpty($client->getDonateURL(array('1')));
+        $this->assertNotEmpty($client->getContributeURL(array('1')));
+        $this->assertNotEmpty($client->getBuyURL(array('1')));
         $this->assertNotEmpty($client->getHealthURL());
     }
 
