@@ -101,7 +101,7 @@ class LaterPay_Http_Client
 		if ( self::$transport !== null ) {
 			return new self::$transport();
 		}
-		// @codeCoverageIgnoreEnd
+		// @codeCoverageIgnoreEnd WPCS: comment ok
 
 		if ( empty( self::$transports ) ) {
 			self::$transports = array(
