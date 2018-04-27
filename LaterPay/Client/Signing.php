@@ -50,9 +50,10 @@ class LaterPay_Client_Signing
             $data = (string) $parts;
         }
 
-        $crypt = new Crypt_Hash( self::$hashAlgo );
-        $crypt->setKey( $secret );
-        $hash = bin2hex( $crypt->hash( $data ) );
+        // limit at length 32 for sha224 as it was the same in previously used library.
+        $raw_hash = substr( hash_hmac( self::$hashAlgo, $data, $secret, true ), 0, 32 );
+        // hexadecimal representation of the given string.
+        $hash = bin2hex( $raw_hash );
 
         return $hash;
     }
