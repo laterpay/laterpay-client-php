@@ -52,9 +52,9 @@ class LaterPay_Http_Transport_Wp extends LaterPay_Http_Transport_Abstract implem
                 break;
             default:
                 $raw_response = LaterPay_Wrapper::laterpay_remote_get( $url, array(
-                    'headers'   => $headers,
-                    'timeout'   => $timeout,
-                ) );
+                    'headers' => $headers,
+                    'timeout' => $timeout,
+                ), '', 3, 3 );
 
                 $response = wp_remote_retrieve_body( $raw_response );
                 break;

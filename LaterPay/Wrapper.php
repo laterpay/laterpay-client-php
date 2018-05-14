@@ -67,7 +67,6 @@ class LaterPay_Wrapper
     public static function laterpay_remote_get( $url, $args = array(), $fallback_value='', $threshold=3, $timeout=1, $retry=20 ) {
 
         if ( laterpay_check_is_vip() ) {
-            // Todo: Handle caching for this.
             $response = vip_safe_wp_remote_get( $url, $fallback_value, $threshold, $timeout, $retry, $args );
         } else {
             $response = wp_remote_get( $url, $args ); // phpcs:ignore
