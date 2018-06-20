@@ -20,7 +20,7 @@ class LaterPay_Http_Transport_Wp extends LaterPay_Http_Transport_Abstract implem
         } else {
             $timeout = 30;
         }
-        if ( in_array( $type, array( LaterPay_Http_Client::HEAD, LaterPay_Http_Client::GET, LaterPay_Http_Client::DELETE ) ) & ! empty( $data ) ) {
+        if ( in_array( $type, array( LaterPay_Http_Client::HEAD, LaterPay_Http_Client::GET, LaterPay_Http_Client::DELETE ), true ) & ! empty( $data ) ) {
             $url = self::format_get( $url, $data );
             $data = '';
         } elseif ( ! empty( $data ) && ! is_string( $data ) ) {
@@ -51,13 +51,11 @@ class LaterPay_Http_Transport_Wp extends LaterPay_Http_Transport_Abstract implem
                 $response = wp_remote_retrieve_body( $raw_response );
                 break;
             default:
-                $raw_response = wp_remote_get(
-                    $url,
-                    array(
-                        'headers'   => $headers,
-                        'timeout'   => $timeout,
-                    )
-                );
+                $raw_response = LaterPay_Wrapper::laterpay_remote_get( $url, array(
+                    'headers' => $headers,
+                    'timeout' => $timeout,
+                ), '', 3, 3 );
+
                 $response = wp_remote_retrieve_body( $raw_response );
                 break;
         }
@@ -79,5 +77,4 @@ class LaterPay_Http_Transport_Wp extends LaterPay_Http_Transport_Abstract implem
     public static function test() {
         return function_exists( 'wp_remote_get' ) && function_exists( 'wp_remote_post' );
     }
-
 }

@@ -20,7 +20,7 @@ class LaterPay_Client_Signing
 	 * @return boolean
 	 */
     protected static function time_independent_hmac_compare( $known_str, $given_str ) {
-        if ( strlen( $known_str ) == 0 ) {
+        if ( strlen( $known_str ) === 0 ) {
             throw new InvalidArgumentException( 'This function cannot safely compare against an empty given string.' );
         }
 
@@ -50,9 +50,10 @@ class LaterPay_Client_Signing
             $data = (string) $parts;
         }
 
-        $crypt = new Crypt_Hash( self::$hashAlgo );
-        $crypt->setKey( $secret );
-        $hash = bin2hex( $crypt->hash( $data ) );
+        // limit at length 32 for sha224 as it was the same in previously used library.
+        $raw_hash = substr( hash_hmac( self::$hashAlgo, $data, $secret, true ), 0, 32 );
+        // hexadecimal representation of the given string.
+        $hash = bin2hex( $raw_hash );
 
         return $hash;
     }
@@ -93,11 +94,11 @@ class LaterPay_Client_Signing
         // this is tricky - either we have (a, b), (a, c) or we have (a, (b, c))
         foreach ( $params as $param_name => $param_value ) {
             if ( is_array( $param_value ) ) {
-                // this is (a, (b, c))
+                // this is (a, (b, c)). WPCS: comment ok
                 $out[$param_name] = $param_value;
             } else {
-                // this is (a, b), (a, c)
-                if ( ! in_array( $param_name, $out ) ) {
+                // this is (a, b), (a, c). WPCS: comment ok
+                if ( ! in_array( $param_name, $out, true ) ) {
                     $out[$param_name] = array();
                 }
                 $out[$param_name][] = $param_value;
@@ -267,7 +268,7 @@ class LaterPay_Client_Signing
      * @return string
      */
     protected static function encode_jwt_data( $data ) {
-        return self::base64url_encode( json_encode( $data ) );
+        return self::base64url_encode( LaterPay_Wrapper::laterpay_json_encode( $data ) );
     }
 
     /**
