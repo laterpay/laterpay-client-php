@@ -453,6 +453,9 @@ class LaterPay_Client
         $this->lptoken = $token;
         try {
             setcookie( $this->token_name, $token, strtotime( '+1 day' ), '/' );
+	        if ( $this->is_vip_go() ) {
+		        setcookie( 'vip-go-cb', '1', strtotime( '+1 day' ), '/' );
+	        }
         } catch ( Exception $e ) {
             unset( $e );
         }
@@ -471,6 +474,9 @@ class LaterPay_Client
     {
         try {
             setcookie( $this->token_name, '', time() - 100000, '/' );
+	        if ( $this->is_vip_go() ) {
+	            setcookie( 'vip-go-cb', '0', time() - 100000, '/' );
+            }
         } catch ( Exception $e ) {
             unset( $e );
         }
@@ -629,5 +635,15 @@ class LaterPay_Client
         }
 
         return true;
+    }
+
+	/**
+	 * Checks if site is on WordPress VIP go.
+	 */
+	public function is_vip_go() {
+		if ( function_exists( 'laterpay_is_vip_go' ) ) {
+			return laterpay_is_vip_go();
+		}
+		return false;
     }
 }
