@@ -83,6 +83,8 @@ class LaterPay_Wrapper
     public static function laterpay_version() {
         if ( function_exists( 'get_option' ) ) {
             return get_option( 'laterpay_plugin_version' );
+        } else {
+            return '0.3';
         }
     }
 }
