@@ -74,4 +74,15 @@ class LaterPay_Wrapper
 
         return $response;
     }
+
+    /**
+     * Get LaterPay Plugin Version.
+     *
+     * @return string
+     */
+    public static function laterpay_version() {
+        if ( function_exists( 'get_option' ) ) {
+            return get_option( 'laterpay_plugin_version' );
+        }
+    }
 }
