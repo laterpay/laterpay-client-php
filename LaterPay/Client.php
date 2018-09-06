@@ -499,7 +499,7 @@ class LaterPay_Client
         $params = $this->sign_and_encode( $params, $url, $method );
         $headers = array(
             'X-LP-APIVersion' => 2,
-            'User-Agent'      => 'LaterPay Client - PHP - v' . LaterPay_Wrapper::laterpay_version(),
+            'User-Agent'      => LaterPay_Wrapper::get_user_agent(),
         );
         try {
             $raw_response_body = LaterPay_Http_Client::request($url, $headers, $params, $method);
@@ -614,7 +614,7 @@ class LaterPay_Client
     {
         $headers = array(
             'X-LP-APIVersion' => 2,
-            'User-Agent'      => 'LaterPay Client - PHP - v' . LaterPay_Wrapper::laterpay_version(),
+            'User-Agent'      => LaterPay_Wrapper::get_user_agent(),
         );
         $method = LaterPay_Http_Client::GET;
         $url    = $this->_get_health_url();
