@@ -586,8 +586,8 @@ class LaterPay_Client
         }
 
         if ( $serverName === 'localhost' and function_exists('site_url')) {
-            $serverName = (str_replace(array('http://', 'https://'), '', site_url())) ; // WP function 
-            // overwrite port on Heroku 
+            $serverName = (str_replace(array('http://', 'https://'), '', site_url())) ; // WP function
+            // overwrite port on Heroku
             if ( isset( $_SERVER['HTTP_CF_VISITOR'] ) && strpos( $_SERVER['HTTP_CF_VISITOR'], 'https' ) !== false ) { // WPCS: sanitization ok, input var ok.
                 $serverPort = 443;
             } else {
@@ -608,9 +608,11 @@ class LaterPay_Client
     /**
      * Method to check url API availability.
      *
-     * @return boolean
+     * @param bool $get_validation_response  Is response requested?
+     *
+     * @return mixed
      */
-    public function check_health()
+    public function check_health( $get_validation_response = false )
     {
         $headers = array(
             'X-LP-APIVersion' => 2,
@@ -628,6 +630,10 @@ class LaterPay_Client
         );
         $url .= '?' . $params;
         try {
+            // Return response of `validatesignature` endpoint.
+            if ( $get_validation_response ) {
+                return LaterPay_Http_Client::request( $url, $headers, array(), $method );
+            }
             LaterPay_Http_Client::request( $url, $headers, array(), $method );
         } catch ( Exception $e ) {
             unset( $e );
