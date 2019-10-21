@@ -323,8 +323,15 @@ class LaterPay_Client
             $data['cp'] = $this->cp_key;
         }
 
-        // force to return lptoken
-        $data['return_lptoken'] = 1;
+        // Only add return_lptoken if endpoint is not for contribution.
+        if ( false === strpos( $endpoint, 'contribute' ) ) {
+            // force to return lptoken
+            $data['return_lptoken'] = 1;
+        } else {
+            // If contribution endpoint make the payment url permanent.
+            $data['permalink'] = 1;
+            unset( $data['revenue'] );
+        }
 
         // jsevent for dialog if specified
         if ( $options['jsevents'] ) {
@@ -370,6 +377,37 @@ class LaterPay_Client
     public function get_add_url( $data, $options = array() )
     {
         return $this->get_web_url( $data, 'add', $options );
+    }
+
+    /**
+     * Get contribution url based on revenue.
+     *
+     * @param array $data Contribution data
+     *
+     * @return string $url
+     */
+    public function get_single_contribution_url( $data ) {
+        $endpoint = 'contribute/pay_now';
+        if ( 'ppu' === $data['revenue'] ) {
+            $endpoint = 'contribute/pay_later';
+        }
+        return $this->get_web_url( $data, $endpoint );
+    }
+
+    /**
+     * Get all contribution url for custom pricing.
+     *
+     * @param array $data Contribution data
+     *
+     * @return array $urls
+     */
+    public function get_contribution_urls( $data ) {
+        $urls = [];
+        $endpoints = array( 'sis' => 'contribute/pay_now', 'ppu' => 'contribute/pay_later' );
+        foreach ( $endpoints as $revenue => $endpoint ) {
+            $urls[$revenue] = $this->get_web_url( $data, $endpoint );
+        }
+        return $urls;
     }
 
     /**
@@ -643,13 +681,13 @@ class LaterPay_Client
         return true;
     }
 
-	/**
-	 * Checks if site is on WordPress VIP go.
-	 */
-	public function is_vip_go() {
-		if ( function_exists( 'laterpay_is_vip_go' ) ) {
-			return laterpay_is_vip_go();
-		}
-		return false;
+    /**
+     * Checks if site is on WordPress VIP go.
+     */
+    public function is_vip_go() {
+        if ( function_exists( 'laterpay_is_vip_go' ) ) {
+            return laterpay_is_vip_go();
+        }
+        return false;
     }
 }

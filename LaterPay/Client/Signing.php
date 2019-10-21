@@ -200,7 +200,8 @@ class LaterPay_Client_Signing
      * @return string query params
      */
     public static function sign_and_encode( $secret, $params, $url, $method = LaterPay_Core_Request::GET ) {
-        if ( ! isset( $params['ts'] ) ) {
+        // Set the time param only if ts and permalink are not set.
+        if ( ! isset( $params['ts'] ) && ! isset( $params['permalink'] ) ) {
             $params['ts'] = (string) time();
         }
 
